@@ -5,6 +5,16 @@ All notable changes to rtk (Rust Token Killer) will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Features
+
+* **scarb**: add `rtk scarb` command for Cairo/Starknet toolchain (build/test/check) with 40-99% token savings
+  - Strip `Compiling`/`Checking` lines, keep errors and user code warnings
+  - Strip scarb cairo-test deprecation noise, plugin compilation, file lock messages
+  - Aggregate test results across suites (failures-only output)
+  - Passthrough support for all other scarb subcommands
+
 ## [0.22.0](https://github.com/rtk-ai/rtk/compare/v0.21.1...v0.22.0) (2026-02-18)
 
 

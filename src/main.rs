@@ -38,6 +38,7 @@ mod pytest_cmd;
 mod read;
 mod ruff_cmd;
 mod runner;
+mod scarb_cmd;
 mod summary;
 mod tee;
 mod tracking;
@@ -519,6 +520,12 @@ enum Commands {
         command: GoCommands,
     },
 
+    /// Scarb commands with compact output (Cairo/Starknet toolchain)
+    Scarb {
+        #[command(subcommand)]
+        command: ScarbCommands,
+    },
+
     /// golangci-lint with compact output
     #[command(name = "golangci-lint")]
     GolangciLint {
@@ -845,6 +852,31 @@ enum GoCommands {
         args: Vec<String>,
     },
     /// Passthrough: runs any unsupported go subcommand directly
+    #[command(external_subcommand)]
+    Other(Vec<OsString>),
+}
+
+#[derive(Subcommand)]
+enum ScarbCommands {
+    /// Build with compact output (strip Compiling lines, keep errors/warnings)
+    Build {
+        /// Additional scarb build arguments
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Test with failures-only output (strips deprecation/plugin noise)
+    Test {
+        /// Additional scarb test arguments
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Check with compact output (strip Checking lines, keep errors/warnings)
+    Check {
+        /// Additional scarb check arguments
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Passthrough: runs any unsupported scarb subcommand directly
     #[command(external_subcommand)]
     Other(Vec<OsString>),
 }
@@ -1417,6 +1449,21 @@ fn main() -> Result<()> {
         Commands::GolangciLint { args } => {
             golangci_cmd::run(&args, cli.verbose)?;
         }
+
+        Commands::Scarb { command } => match command {
+            ScarbCommands::Build { args } => {
+                scarb_cmd::run(scarb_cmd::ScarbCommand::Build, &args, cli.verbose)?;
+            }
+            ScarbCommands::Test { args } => {
+                scarb_cmd::run(scarb_cmd::ScarbCommand::Test, &args, cli.verbose)?;
+            }
+            ScarbCommands::Check { args } => {
+                scarb_cmd::run(scarb_cmd::ScarbCommand::Check, &args, cli.verbose)?;
+            }
+            ScarbCommands::Other(args) => {
+                scarb_cmd::run_passthrough(&args, cli.verbose)?;
+            }
+        },
 
         Commands::HookAudit { since } => {
             hook_audit_cmd::run(since, cli.verbose)?;

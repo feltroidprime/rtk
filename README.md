@@ -284,6 +284,15 @@ rtk go vet                       # Vet issues (75% reduction)
 rtk golangci-lint run            # JSON grouped by rule (85% reduction)
 ```
 
+### Cairo / Starknet Stack
+```bash
+# Scarb (Cairo toolchain — like cargo for Cairo/Starknet)
+rtk scarb build                  # Strip Compiling noise, keep errors/warnings (40-99% reduction)
+rtk scarb check                  # Like build but with Checking (40-99% reduction)
+rtk scarb test                   # Strip deprecation/plugin noise, failures only (99% reduction)
+rtk scarb <other>                # Passthrough for any other scarb subcommand
+```
+
 ## Examples
 
 ### Standard vs rtk
@@ -458,7 +467,7 @@ max_file_size = 1048576 # 1MB per file max
 - `RTK_TEE=0` — disable tee entirely
 - `RTK_TEE_DIR=/path` — override output directory
 
-**Supported commands**: cargo (build/test/clippy/check/install/nextest), vitest, pytest, lint (eslint/biome/ruff/pylint/mypy), tsc, go (test/build/vet), err, test.
+**Supported commands**: cargo (build/test/clippy/check/install/nextest), scarb (build/test/check), vitest, pytest, lint (eslint/biome/ruff/pylint/mypy), tsc, go (test/build/vet), err, test.
 
 ## Auto-Rewrite Hook (Recommended)
 
@@ -576,6 +585,7 @@ The hook is included in this repository at `.claude/hooks/rtk-rewrite.sh`. To us
 | `pip list/install/outdated` | `rtk pip ...` |
 | `go test/build/vet` | `rtk go ...` |
 | `golangci-lint run` | `rtk golangci-lint run` |
+| `scarb build/test/check` | `rtk scarb ...` |
 | `docker ps/images/logs` | `rtk docker ...` |
 | `kubectl get/logs` | `rtk kubectl ...` |
 | `curl` | `rtk curl` |
