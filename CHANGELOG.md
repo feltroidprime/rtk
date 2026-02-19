@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
+* **snforge**: add `rtk snforge` command for Starknet Foundry test runner with ~99% token savings
+  - Strip compilation noise (Compiling, Blocking, Finished), compiler warnings, Running lines
+  - Strip `[PASS]` and `[IGNORED]` lines on success; always preserve `[FAIL]` + `Failure data:` blocks
+  - Strip gas report ASCII tables (╭╰│) and detailed resources (sierra gas:, syscalls:, builtins:)
+  - Compact success: `✓ snforge test: 34 passed (4 packages)`
+  - Passthrough support for other subcommands (new, clean, check-requirements, completions)
+
 * **scarb**: add `rtk scarb` command for Cairo/Starknet toolchain (build/test/check) with 40-99% token savings
   - Strip `Compiling`/`Checking` lines, keep errors and user code warnings
   - Strip scarb cairo-test deprecation noise, plugin compilation, file lock messages

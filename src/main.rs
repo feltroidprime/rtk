@@ -39,6 +39,7 @@ mod read;
 mod ruff_cmd;
 mod runner;
 mod scarb_cmd;
+mod snforge_cmd;
 mod summary;
 mod tee;
 mod tracking;
@@ -526,6 +527,12 @@ enum Commands {
         command: ScarbCommands,
     },
 
+    /// Snforge (Starknet Foundry) test runner with compact output (~90% savings)
+    Snforge {
+        #[command(subcommand)]
+        command: SnforgeCommands,
+    },
+
     /// golangci-lint with compact output
     #[command(name = "golangci-lint")]
     GolangciLint {
@@ -877,6 +884,19 @@ enum ScarbCommands {
         args: Vec<String>,
     },
     /// Passthrough: runs any unsupported scarb subcommand directly
+    #[command(external_subcommand)]
+    Other(Vec<OsString>),
+}
+
+#[derive(Subcommand)]
+enum SnforgeCommands {
+    /// Test runner with compact output (failures only, ~90% savings)
+    Test {
+        /// Additional snforge test arguments
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
+    /// Passthrough: runs any unsupported snforge subcommand directly (new, clean, check-requirements, completions)
     #[command(external_subcommand)]
     Other(Vec<OsString>),
 }
@@ -1462,6 +1482,15 @@ fn main() -> Result<()> {
             }
             ScarbCommands::Other(args) => {
                 scarb_cmd::run_passthrough(&args, cli.verbose)?;
+            }
+        },
+
+        Commands::Snforge { command } => match command {
+            SnforgeCommands::Test { args } => {
+                snforge_cmd::run(snforge_cmd::SnforgeCommand::Test, &args, cli.verbose)?;
+            }
+            SnforgeCommands::Other(args) => {
+                snforge_cmd::run_passthrough(&args, cli.verbose)?;
             }
         },
 

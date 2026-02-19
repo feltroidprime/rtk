@@ -230,6 +230,7 @@ rtk gain --history | grep proxy
 | go_cmd.rs | Go commands | NDJSON for test, text for build/vet (80-90% reduction) |
 | golangci_cmd.rs | golangci-lint | JSON parsing, group by rule (85% reduction) |
 | scarb_cmd.rs | Scarb (Cairo/Starknet) | Strip Compiling/noise, user warnings, failures only (40-99% reduction) |
+| snforge_cmd.rs | Snforge (Starknet Foundry) | Strip compilation/[PASS]/gas tables, failures only (~99% reduction) |
 | tee.rs | Full output recovery | Save raw output to file on failure, print hint for LLM re-read |
 | utils.rs | Shared utilities | Package manager detection, common formatting |
 | discover/ | Claude Code history analysis | Scan JSONL sessions, classify commands, report missed savings |

@@ -291,6 +291,11 @@ rtk scarb build                  # Strip Compiling noise, keep errors/warnings (
 rtk scarb check                  # Like build but with Checking (40-99% reduction)
 rtk scarb test                   # Strip deprecation/plugin noise, failures only (99% reduction)
 rtk scarb <other>                # Passthrough for any other scarb subcommand
+
+# Snforge (Starknet Foundry test runner — replaces scarb cairo-test)
+rtk snforge test                 # Failures only, strip [PASS]/[IGNORED]/gas tables (~99% reduction)
+rtk snforge test --gas-report    # Gas report tables also stripped
+rtk snforge <other>              # Passthrough for new, clean, check-requirements, completions
 ```
 
 ## Examples
