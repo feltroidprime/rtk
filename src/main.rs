@@ -912,7 +912,88 @@ enum SnforgeCommands {
     Other(Vec<OsString>),
 }
 
+/// RTK meta-commands (everything else is a filter).
+const RTK_CMDS: &[&str] = &[
+    "cc-economics",
+    "config",
+    "discover",
+    "gain",
+    "hook-audit",
+    "init",
+    "learn",
+    "proxy",
+];
+
+fn print_rtk_help() {
+    use clap::CommandFactory;
+
+    let app = Cli::command();
+    let rtk_set: std::collections::HashSet<&str> = RTK_CMDS.iter().copied().collect();
+
+    let mut rtk_subs: Vec<(String, String)> = Vec::new();
+    let mut filter_subs: Vec<(String, String)> = Vec::new();
+
+    for sub in app.get_subcommands() {
+        let name = sub.get_name().to_string();
+        if name == "help" || sub.is_hide_set() {
+            continue;
+        }
+        let about = sub.get_about().map(|s| s.to_string()).unwrap_or_default();
+        if rtk_set.contains(name.as_str()) {
+            rtk_subs.push((name, about));
+        } else {
+            filter_subs.push((name, about));
+        }
+    }
+
+    rtk_subs.sort_by(|a, b| a.0.cmp(&b.0));
+    filter_subs.sort_by(|a, b| a.0.cmp(&b.0));
+
+    let col = rtk_subs
+        .iter()
+        .chain(filter_subs.iter())
+        .map(|(n, _)| n.len())
+        .max()
+        .unwrap_or(10);
+
+    let long_about = app
+        .get_long_about()
+        .map(|s| s.to_string())
+        .or_else(|| app.get_about().map(|s| s.to_string()))
+        .unwrap_or_default();
+
+    println!("{}", long_about);
+    println!();
+    println!("Usage: rtk [OPTIONS] <COMMAND>");
+    println!();
+    println!("RTK:");
+    for (name, about) in &rtk_subs {
+        println!("  {:<col$}  {}", name, about);
+    }
+    println!();
+    println!("Filters:");
+    for (name, about) in &filter_subs {
+        println!("  {:<col$}  {}", name, about);
+    }
+    println!();
+    // Options are stable; update if Cli global args change.
+    println!("Options:");
+    println!("  -v, --verbose...     Verbosity level (-v, -vv, -vvv)");
+    println!("  -u, --ultra-compact  Ultra-compact mode: ASCII icons, inline format (Level 2 optimizations)");
+    println!("      --skip-env       Set SKIP_ENV_VALIDATION=1 for child processes (Next.js, tsc, lint, prisma)");
+    println!("  -h, --help           Print help");
+    println!("  -V, --version        Print version");
+}
+
 fn main() -> Result<()> {
+    // Intercept top-level help before clap to show RTK / Filters sections.
+    let argv: Vec<String> = std::env::args().skip(1).collect();
+    if argv.is_empty() || (argv.len() == 1 && matches!(argv[0].as_str(), "--help" | "-h" | "help"))
+    {
+        print_rtk_help();
+        return Ok(());
+    }
+
     let cli = Cli::parse();
 
     match cli.command {
